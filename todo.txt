@@ -1,0 +1,25 @@
+"""
+api_key = "YyFyNwsMj9x8O4rTLAUlxmHlwLR5irddOZJnCyREvcByidIpS2AZO3o2V8DonG7c"
+api_secret = "pwYWNmuUiib7GPEUt410ER9XapW999dBZvTaUBPJhbH4w6Fw3VW309UAtCZXZKxJ"
+
+client = Client(api_key, api_secret)
+
+pair = "BTCUSDT"b
+interval = "1d"
+
+timestamp = client._get_earliest_valid_timestamp(pair, interval)
+bars = client.get_historical_klines(pair, interval, timestamp, limit=1000)
+
+for line in bars:
+    del line[6:]
+
+btc_df = pd.DataFrame(bars, columns=['date', 'open', 'high', 'low', 'close', 'volume'])
+btc_df.set_index('date', inplace=True)
+btc_df.index = pd.to_datetime(btc_df.index, unit='ms')
+
+"""
+
+"""
+Usar varios indicadores?
+como testar a eficiencia deles?
+"""
