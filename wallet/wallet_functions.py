@@ -13,8 +13,7 @@ def read_transactions_to_wallet():
     wallet_information = {}
     wallet_information["resume"] = wv.RESUME.copy()
 
-    with open('/home/someone/Documents/UNAMED/csv_files/last-index.txt', 'r') as f:
-        last_index = int(f.read())
+    last_index = read_last_index_csv()
 
     if last_index == df.index[-1]:
         wallet_information = read_wallet_information()
@@ -22,17 +21,51 @@ def read_transactions_to_wallet():
         wallet = convert_wallet_to_float(wallet)
         return wallet, wallet_information
 
-    if last_index > 0:
-        last_index += 1
+    if last_index > 0: last_index += 1
 
     wallet, wallet_information = loop_in_transactions(df.iloc[last_index:,:], wallet, wallet_information)
 
-    with open('/home/someone/Documents/UNAMED/csv_files/last-index.txt', 'w') as f:
-        f.write(f"{df.index[-1]}")
+    write_last_index_csv(df.index[-1])
 
     wallet = convert_wallet_to_float(wallet)
 
+    wallet = mirror_ammount_bought_now_ifnull(wallet)
+
+    save_wallet_to_csv(wallet)
+    save_wallet_information_to_csv(wallet_information)
+
     return wallet, wallet_information
+
+
+def read_last_index_csv():
+    with open('/home/someone/Documents/project/csv_files/last-index.txt', "r") as f:
+        return int(f.read())
+
+def write_last_index_csv(index):
+    with open('/home/someone/Documents/project/csv_files/last-index.txt', 'w') as f:
+        f.write(str(index))
+
+
+def mirror_ammount_bought_now_ifnull(wallet):
+    """
+    If wallet.csv is empty, ammount now receives ammount bought
+    """
+    try:
+        pd.read_csv("/home/someone/Documents/project/csv_files/full-wallet.csv")
+    except:
+        dt = pd.DataFrame(wallet)
+        dt.loc["ammount_now",:] = dt.loc["ammount_bought",:]
+        return dt.to_dict()
+    else:
+        return wallet
+
+
+def save_wallet_to_csv(wallet):
+    pd.DataFrame(wallet).to_csv("/home/someone/Documents/project/csv_files/full-wallet.csv")
+
+
+def save_wallet_information_to_csv(wallet_information):
+    pd.DataFrame(wallet_information).to_csv("/home/someone/Documents/project/csv_files/full-wallet-information.csv")
 
 
 def next_goal(number):
@@ -55,7 +88,7 @@ def next_goal(number):
 
 
 def read_wallet_information():
-    wallet_information = pd.read_csv("/home/someone/Documents/UNAMED/csv_files/full-wallet-information.csv").rename(columns={"Unnamed: 0":""}).set_index("").to_dict()
+    wallet_information = pd.read_csv("/home/someone/Documents/project/csv_files/full-wallet-information.csv").rename(columns={"Unnamed: 0":""}).set_index("").to_dict()
     wallet_information["resume"] = {"invested":{
         "invested":wallet_information["resume"]["invested"],
         "today_investment":wallet_information["resume"]["today_investment"],
@@ -68,32 +101,32 @@ def read_wallet_information():
         "eur":wallet_information["deposit"]["eur"],
         "stasis-euro":wallet_information["deposit"]["stasis-euro"]
     }}.copy()
-    wallet_information["tether"] = {"tether":{
-        "invested":wallet_information["tether"]["invested"],
-        "ammount_now":wallet_information["tether"]["ammount_now"],
-        "interest_earned":wallet_information["tether"]["interest_earned"],
-        "actual_allocation":wallet_information["tether"]["actual_allocation"],
-        "default_allocation":wallet_information["tether"]["default_allocation"],
-        "next_deposit":wallet_information["tether"]["next_deposit"],
-        "previous_deposit":wallet_information["tether"]["previous_deposit"],
-        "deposit_impact":wallet_information["tether"]["deposit_impact"]
+    wallet_information["USDT"] = {"USDT":{
+        "invested":wallet_information["USDT"]["invested"],
+        "ammount_now":wallet_information["USDT"]["ammount_now"],
+        "interest_earned":wallet_information["USDT"]["interest_earned"],
+        "actual_allocation":wallet_information["USDT"]["actual_allocation"],
+        "default_allocation":wallet_information["USDT"]["default_allocation"],
+        "next_deposit":wallet_information["USDT"]["next_deposit"],
+        "previous_deposit":wallet_information["USDT"]["previous_deposit"],
+        "deposit_impact":wallet_information["USDT"]["deposit_impact"]
     }}.copy()
-    wallet_information["usd-coin"] = {"usd-coin":{
-        "invested":wallet_information["usd-coin"]["invested"],
-        "ammount_now":wallet_information["usd-coin"]["ammount_now"],
-        "interest_earned":wallet_information["usd-coin"]["interest_earned"],
-        "actual_allocation":wallet_information["usd-coin"]["actual_allocation"],
-        "default_allocation":wallet_information["usd-coin"]["default_allocation"],
-        "next_deposit":wallet_information["usd-coin"]["next_deposit"],
-        "previous_deposit":wallet_information["usd-coin"]["previous_deposit"],
-        "deposit_impact":wallet_information["usd-coin"]["deposit_impact"]
+    wallet_information["USDC"] = {"USDC":{
+        "invested":wallet_information["USDC"]["invested"],
+        "ammount_now":wallet_information["USDC"]["ammount_now"],
+        "interest_earned":wallet_information["USDC"]["interest_earned"],
+        "actual_allocation":wallet_information["USDC"]["actual_allocation"],
+        "default_allocation":wallet_information["USDC"]["default_allocation"],
+        "next_deposit":wallet_information["USDC"]["next_deposit"],
+        "previous_deposit":wallet_information["USDC"]["previous_deposit"],
+        "deposit_impact":wallet_information["USDC"]["deposit_impact"]
     }}.copy()
 
     return wallet_information
 
 
 def read_wallet():
-    wallet = pd.read_csv("/home/someone/Documents/UNAMED/csv_files/full-wallet.csv").rename(columns={"Unnamed: 0":""}).set_index("").to_dict()
+    wallet = pd.read_csv("/home/someone/Documents/project/csv_files/full-wallet.csv").rename(columns={"Unnamed: 0":""}).set_index("").to_dict()
     return wallet
 
 
@@ -136,6 +169,7 @@ def loop_in_transactions(df, wallet, wallet_information):
 
 
 def update_wallets_data(wallet, wallet_information):
+
     wallet_information["deposit"]["stasis-euro"] = cmc.get_eur_price()
     for i in wallet.keys():
         price, name = bnbdata.get_last_price_available(i)

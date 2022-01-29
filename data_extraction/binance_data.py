@@ -21,8 +21,6 @@ def get_historical_prices_df(symbol, interval):
 
     client = login_binance()
 
-    symbol = cmc.get_symbol_name(symbol)
-
     try:
         timestamp = client._get_earliest_valid_timestamp(f"{symbol}USDT", interval)
         bars = client.get_historical_klines(f"{symbol}USDT", interval, timestamp, limit=1000)
@@ -49,7 +47,6 @@ def get_last_price_available(symbol):
     https://coinmarketcap.com/currencies/ CRYPTO-NAME /
     """
 
-    symbol = cmc.get_symbol_name(symbol)
     price = 0.0
 
     client = login_binance()
@@ -60,3 +57,4 @@ def get_last_price_available(symbol):
         price = client.get_symbol_ticker(symbol=f"USDT{symbol}")
 
     return float(price["price"]), price["symbol"]
+
