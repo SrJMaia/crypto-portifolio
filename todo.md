@@ -6,12 +6,19 @@ resumo de problemas?
     - Checar se tudo da 100%
 resumo de fechamento de operações
 
+Adicionar mudar valor atual
+    criar docstring
+    organizar em multiplas pastas?
+
+print wallet, sort pela alocação
+
 csv para despesas
 csv para reserva e casa/projetos?
 
 * Futuramente diminuir o tempo de pegar os dados com binance e scrapping?
 Mensurar tempo do read wallet
 
+pedir password no inciio, se errada, não entrar?
 3 - adicionar modificação do now com a quantidade de moedas
 4 - adicionar aportes com impacto e distribuição do aporte
 5 - adicionar adição de transação
@@ -25,3 +32,8 @@ https://alternative.me/crypto/trends/
 
 fazer uma correlção do preço do bitcoin com ofear greed index
 futuramente achar uma forma de mudar a alocação, sem definir uma constante
+
+Airdrops
+https://airdropking.io/en/
+https://airdrops.io
+https://airdropalert.com/

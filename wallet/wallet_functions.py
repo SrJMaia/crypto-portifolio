@@ -5,7 +5,13 @@ from data_extraction import binance_data as bnbdata
 from data_extraction import cmc_data as cmc
 
 
-def read_transactions_to_wallet():
+def get_wallets():
+
+    try:
+        if_transactions_not_empty()
+    except:
+        print("\nTransactions is empty, please add a transaction.\n")
+        return 0, 0
 
     df = transactions.read_transactions()
 
@@ -21,8 +27,6 @@ def read_transactions_to_wallet():
         wallet = convert_wallet_to_float(wallet)
         return wallet, wallet_information
 
-    if last_index > 0: last_index += 1
-
     wallet, wallet_information = loop_in_transactions(df.iloc[last_index:,:], wallet, wallet_information)
 
     write_last_index_csv(df.index[-1])
@@ -31,15 +35,29 @@ def read_transactions_to_wallet():
 
     wallet = mirror_ammount_bought_now_ifnull(wallet)
 
+    wallet = adjust_interest(wallet)
+
     save_wallet_to_csv(wallet)
     save_wallet_information_to_csv(wallet_information)
 
     return wallet, wallet_information
 
 
+def adjust_interest(wallet):
+    for i in wallet.keys():
+        wallet[i]["interest_earned"] = wallet[i]["ammount_now"] - wallet[i]["ammount_bought"]
+        wallet[i]["growth_interest"] = wallet[i]["ammount_now"] / wallet[i]["ammount_bought"] - 1
+    return wallet
+
+
+def if_transactions_not_empty():
+    pd.read_csv("/home/someone/Documents/project/csv_files/transactions.csv")
+    
+
 def read_last_index_csv():
     with open('/home/someone/Documents/project/csv_files/last-index.txt', "r") as f:
         return int(f.read())
+
 
 def write_last_index_csv(index):
     with open('/home/someone/Documents/project/csv_files/last-index.txt', 'w') as f:
@@ -50,14 +68,10 @@ def mirror_ammount_bought_now_ifnull(wallet):
     """
     If wallet.csv is empty, ammount now receives ammount bought
     """
-    try:
-        pd.read_csv("/home/someone/Documents/project/csv_files/full-wallet.csv")
-    except:
-        dt = pd.DataFrame(wallet)
-        dt.loc["ammount_now",:] = dt.loc["ammount_bought",:]
-        return dt.to_dict()
-    else:
-        return wallet
+    for i in wallet.keys():
+        if wallet[i]["ammount_now"] == 0:
+            wallet[i]["ammount_now"] = wallet[i]["ammount_bought"]
+    return wallet
 
 
 def save_wallet_to_csv(wallet):

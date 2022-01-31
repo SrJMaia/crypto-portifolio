@@ -4,9 +4,9 @@ import pandas as pd
 import pretty_table.pretty_table_variables as ptv
 
 
-def print_wallet():
+def print_wallet(wallet):
 
-    data = pretty_table_data()
+    data = pretty_table_data(wallet)
 
     body = PrettyTable()
     for i in data:
@@ -19,8 +19,6 @@ def print_wallet():
 
 def prepare_data_to_print(wallet):
     dt = pd.DataFrame(data=wallet)
-    dt.loc["interest_earned",:] = dt.loc["ammount_bought",:] - dt.loc["ammount_now",:]
-    dt.loc["growth_interest",:] = dt.loc["ammount_now",:] / dt.loc["ammount_bought",:] - 1
     dt.loc["average_price",:] = dt.loc["bought_prices_sum",:] / dt.loc["bought_prices_times",:]
     dt.drop("bought_prices_sum",inplace=True)
     dt.drop("bought_prices_times",inplace=True)
@@ -46,7 +44,6 @@ def pretty_table_data(wallet):
         temporary_list = []
         temporary_list.append(f"{Fore.LIGHTCYAN_EX}{coin_name}{Fore.RESET}")
         temporary_list.append([])
-        save_actual_allocation = 0.0
         for index, value in enumerate(wallet[coin_name].values()):
             if index in [ptv.INVESTED, ptv.INVESTMENT_NOW, ptv.GAIN_FIAT, ptv.NEXT_DEPOSIT, ptv.PREVIOUS_DEPOSIT, ptv.AVERAGE_PRICE]:
                 if index in [ptv.GAIN_FIAT,ptv.NEXT_DEPOSIT,ptv.PREVIOUS_DEPOSIT]:
@@ -61,19 +58,25 @@ def pretty_table_data(wallet):
             elif index == ptv.PRICE_TODAY:
                 temporary_list[1].append(f"$ {round(value,4)}")
             elif index in [ptv.AMMOUNT_BOUGHT, ptv.AMMOUNT_NOW, ptv.INTEREST_EARNED]:
+                if index == ptv.INTEREST_EARNED:
+                    if value < 0:
+                        temporary_list[1].append(f"{Fore.LIGHTRED_EX}{round(value*100,6)}{Fore.RESET}")
+                        continue
+                    elif value > 0:
+                        temporary_list[1].append(f"{Fore.LIGHTGREEN_EX}{round(value*100,6)}{Fore.RESET}")
+                        continue
                 temporary_list[1].append(round(value,6))
             elif index in [ptv.GROWTH_INTEREST, ptv.GROWTH_FIAT, ptv.ACTUAL_ALLOCATION, ptv.DEFAULT_ALLOCATION, ptv.DEPOSIT_IMPPACT]:
-                if index == ptv.ACTUAL_ALLOCATION: save_actual_allocation = value
                 if index == ptv.DEFAULT_ALLOCATION:
-                    if save_actual_allocation < value:
-                        temporary_list[1][-1] = f"{Fore.LIGHTRED_EX}{round(save_actual_allocation*100,2)} %{Fore.RESET}"
-                    elif save_actual_allocation > value:
-                        temporary_list[1][-1] = f"{Fore.LIGHTGREEN_EX}{round(save_actual_allocation*100,2)} %{Fore.RESET}"
+                    if wallet[coin_name]["Actual Allocation"] < value:
+                        temporary_list[1][-1] = f"{Fore.LIGHTRED_EX}{round(wallet[coin_name]['Actual Allocation']*100,2)} %{Fore.RESET}"
+                    elif wallet[coin_name]["Actual Allocation"] > value:
+                        temporary_list[1][-1] = f"{Fore.LIGHTGREEN_EX}{round(wallet[coin_name]['Actual Allocation']*100,2)} %{Fore.RESET}"
                     temporary_list[1].append(f"{round(value*100,2)} %")
                 elif index in [ptv.GROWTH_INTEREST, ptv.GROWTH_FIAT, ptv.DEPOSIT_IMPPACT]:
-                    if value < 0 or save_actual_allocation < value:
+                    if value < 0:
                         temporary_list[1].append(f"{Fore.LIGHTRED_EX}{round(value*100,2)} %{Fore.RESET}")
-                    elif value > 0 or save_actual_allocation > value:
+                    elif value > 0:
                         temporary_list[1].append(f"{Fore.LIGHTGREEN_EX}{round(value*100,2)} %{Fore.RESET}")
                     else:
                         temporary_list[1].append(f"{round(value*100,2)} %")
