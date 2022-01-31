@@ -1,6 +1,5 @@
-import pandas as pd
-import data_extraction.cmc_data as cmc
 from binance import Client
+import pandas as pd
 
 api_key = "YyFyNwsMj9x8O4rTLAUlxmHlwLR5irddOZJnCyREvcByidIpS2AZO3o2V8DonG7c"
 api_secret = "pwYWNmuUiib7GPEUt410ER9XapW999dBZvTaUBPJhbH4w6Fw3VW309UAtCZXZKxJ"

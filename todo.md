@@ -15,11 +15,8 @@ print wallet, sort pela alocação
 csv para despesas
 csv para reserva e casa/projetos?
 
-* Futuramente diminuir o tempo de pegar os dados com binance e scrapping?
-Mensurar tempo do read wallet
-
 pedir password no inciio, se errada, não entrar?
-3 - adicionar modificação do now com a quantidade de moedas
+Adicionar moeda
 4 - adicionar aportes com impacto e distribuição do aporte
 5 - adicionar adição de transação
 5.1 - adicionar o dry-in e fix-income-in

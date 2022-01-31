@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import menu.main_menu_functions as mf
+from menu.menu_main import menu
 
-mf.menu()
+menu()

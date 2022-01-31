@@ -4,7 +4,7 @@ def read_transactions():
     """
     Read transaction csv file and formating dtype
     """
-    df = pd.read_csv("/home/someone/Documents/project/csv_files/transactions.csv")
+    df = pd.read_csv("/home/someone/Documents/project/csv_files/files/transactions.csv")
     df.loc[:,"date"] = pd.to_datetime(df.loc[:, "date"])
     df.loc[:, "type"] = df.loc[:, "type"].astype("string")
     df.loc[:, "primary"] = df.loc[:, "primary"].astype("string")
@@ -25,4 +25,4 @@ def save_transactions(df):
     """
     Save transactions csv file
     """
-    df.to_csv("/home/someone/Documents/project/csv_files/transactions.csv", index=False)
+    df.to_csv("/home/someone/Documents/project/csv_files/files/transactions.csv", index=False)
