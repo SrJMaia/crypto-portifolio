@@ -24,6 +24,8 @@ def get_wallets():
         wallet = fmf.read_wallet()
         wallet = convert_wallet_to_float(wallet)
         wallet, wallet_information = update_wallets_data(wallet, wallet_information)
+        fmf.save_wallet_to_csv(wallet)
+        fmf.save_wallet_information_to_csv(wallet_information)
         return wallet, wallet_information
 
     wallet, wallet_information = loop_in_transactions(df.iloc[last_index:,:], wallet, wallet_information)
@@ -74,39 +76,41 @@ def read_wallet_information():
     """
     Read wallet information and delet unnecessary keys
     """
-    wallet_information = fmf.read_wallet_informations()
-    wallet_information["resume"] = {"invested":{
-        "invested":float(wallet_information["resume"]["invested"]),
-        "today_investment":float(wallet_information["resume"]["today_investment"]),
-        "gain":float(wallet_information["resume"]["gain"]),
-        "growth":float(wallet_information["resume"]["growth"]),
-        "pairs_ammount":float(wallet_information["resume"]["pairs_ammount"]),
-        "next_goal":float(wallet_information["resume"]["next_goal"])
-    }}.copy()
-    wallet_information["deposit"] = {"deposit":{
-        "eur":float(wallet_information["deposit"]["eur"]),
-        "stasis-euro":float(wallet_information["deposit"]["stasis-euro"])
-    }}.copy()
-    wallet_information["USDT"] = {"USDT":{
-        "invested":float(wallet_information["USDT"]["invested"]),
-        "ammount_now":float(wallet_information["USDT"]["ammount_now"]),
-        "interest_earned":float(wallet_information["USDT"]["interest_earned"]),
-        "actual_allocation":float(wallet_information["USDT"]["actual_allocation"]),
-        "default_allocation":float(wallet_information["USDT"]["default_allocation"]),
-        "next_deposit":float(wallet_information["USDT"]["next_deposit"]),
-        "previous_deposit":float(wallet_information["USDT"]["previous_deposit"]),
-        "deposit_impact":float(wallet_information["USDT"]["deposit_impact"])
-    }}.copy()
-    wallet_information["USDC"] = {"USDC":{
-        "invested":float(wallet_information["USDC"]["invested"]),
-        "ammount_now":float(wallet_information["USDC"]["ammount_now"]),
-        "interest_earned":float(wallet_information["USDC"]["interest_earned"]),
-        "actual_allocation":float(wallet_information["USDC"]["actual_allocation"]),
-        "default_allocation":float(wallet_information["USDC"]["default_allocation"]),
-        "next_deposit":float(wallet_information["USDC"]["next_deposit"]),
-        "previous_deposit":float(wallet_information["USDC"]["previous_deposit"]),
-        "deposit_impact":float(wallet_information["USDC"]["deposit_impact"])
-    }}.copy()
+    read_wallet_info = fmf.read_wallet_informations()
+    
+    wallet_information = {}
+    wallet_information["resume"] = wv.STABLE.copy()
+    wallet_information["deposit"] = wv.FIAT.copy()
+    wallet_information["USDT"] = wv.STABLE.copy()
+    wallet_information["USDC"] = wv.STABLE.copy()
+
+    wallet_information["resume"]["invested"] = float(read_wallet_info["resume"]["invested"])
+    wallet_information["resume"]["today_investment"] = float(read_wallet_info["resume"]["today_investment"])
+    wallet_information["resume"]["gain"] = float(read_wallet_info["resume"]["gain"])
+    wallet_information["resume"]["growth"] = float(read_wallet_info["resume"]["growth"])
+    wallet_information["resume"]["pairs_ammount"] = float(read_wallet_info["resume"]["pairs_ammount"])
+    wallet_information["resume"]["next_goal"] = float(read_wallet_info["resume"]["next_goal"])
+    
+    wallet_information["deposit"]["eur"] = float(read_wallet_info["deposit"]["eur"])
+    wallet_information["deposit"]["stasis-euro"] = float(read_wallet_info["deposit"]["stasis-euro"])
+
+    wallet_information["USDT"]["invested"] = float(read_wallet_info["USDT"]["invested"])
+    wallet_information["USDT"]["ammount_now"] = float(read_wallet_info["USDT"]["ammount_now"])
+    wallet_information["USDT"]["interest_earned"] = float(read_wallet_info["USDT"]["interest_earned"])
+    wallet_information["USDT"]["actual_allocation"] = float(read_wallet_info["USDT"]["actual_allocation"])
+    wallet_information["USDT"]["default_allocation"] = float(read_wallet_info["USDT"]["default_allocation"])
+    wallet_information["USDT"]["next_deposit"] = float(read_wallet_info["USDT"]["next_deposit"])
+    wallet_information["USDT"]["previous_deposit"] = float(read_wallet_info["USDT"]["previous_deposit"])
+    wallet_information["USDT"]["deposit_impact"] = float(read_wallet_info["USDT"]["deposit_impact"])
+
+    wallet_information["USDC"]["invested"] = float(read_wallet_info["USDC"]["invested"])
+    wallet_information["USDC"]["ammount_now"] = float(read_wallet_info["USDC"]["ammount_now"])
+    wallet_information["USDC"]["interest_earned"] = float(read_wallet_info["USDC"]["interest_earned"])
+    wallet_information["USDC"]["actual_allocation"] = float(read_wallet_info["USDC"]["actual_allocation"])
+    wallet_information["USDC"]["default_allocation"] = float(read_wallet_info["USDC"]["default_allocation"])
+    wallet_information["USDC"]["next_deposit"] = float(read_wallet_info["USDC"]["next_deposit"])
+    wallet_information["USDC"]["previous_deposit"] = float(read_wallet_info["USDC"]["previous_deposit"])
+    wallet_information["USDC"]["deposit_impact"] = float(read_wallet_info["USDC"]["deposit_impact"])
 
     return wallet_information
 
@@ -134,7 +138,8 @@ def loop_in_transactions(df, wallet, wallet_information):
             if i[wv.ACTION_TYPE] == "deposit":
                 if not i[wv.ACTION_TYPE] in wallet_information.keys():
                     wallet_information[i[wv.ACTION_TYPE]] = wv.FIAT.copy()
-                wallet_information[i[wv.ACTION_TYPE]]["eur"] += i[wv.PRI_AMMOUNT]
+                if i[wv.PRIMARY] == "eur":
+                    wallet_information[i[wv.ACTION_TYPE]]["eur"] += i[wv.PRI_AMMOUNT]
             else:
                 if not i[wv.PRIMARY] in wallet_information.keys():
                     wallet_information[i[wv.PRIMARY]] = wv.STABLE.copy()
@@ -160,7 +165,7 @@ def update_wallets_data(wallet, wallet_information):
     wallet_information["resume"]["invested"] = 0
     wallet_information["resume"]["today_investment"] = 0
     pbar = tqdm(total=len(wallet.keys()))
-    for ii,i in enumerate(wallet.keys()):
+    for i in wallet.keys():
         pbar.update(1)
         price, name = bnbdata.get_last_price_available(i)
         wallet[i]["price_today"] = price

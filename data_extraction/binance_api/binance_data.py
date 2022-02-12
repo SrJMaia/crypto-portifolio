@@ -42,8 +42,7 @@ def get_last_price_available(symbol):
     Get last available price from binance
 
     client: binance class
-    symbol: must be from cmc
-    https://coinmarketcap.com/currencies/ CRYPTO-NAME /
+    symbol: must be the ticker
     """
 
     price = 0.0
@@ -54,6 +53,8 @@ def get_last_price_available(symbol):
         price = client.get_symbol_ticker(symbol=f"{symbol}USDT")
     except:
         price = client.get_symbol_ticker(symbol=f"USDT{symbol}")
-
-    return float(price["price"]), price["symbol"]
+    finally:
+        if price != 0:
+            return float(price["price"]), price["symbol"]
+        return price, price
 

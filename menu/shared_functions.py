@@ -6,7 +6,7 @@ def get_menu_action(mode):
         input_action = input("\nEnter the input relateded to an action: ")
 
         if not input_action.isnumeric():
-            print("\nThe input isn't a number or an integer.")
+            print("\nThe input isn't an option.")
             continue
 
         input_action = int(input_action)
@@ -19,8 +19,10 @@ def get_menu_action(mode):
                 print("\nInvalid option.")
                 continue
         elif mode == "wallet":
-            if input_action not in [mv.SHOW_WALLET, mv.CHANGE_ANY_AMMOUNT]:
+            if input_action not in [mv.SHOW_WALLET, mv.CHANGE_ANY_AMMOUNT, mv.ADD_CRYPTO]:
                 print("\nInvalid option.")
                 continue
 
         return int(input_action)
+
+

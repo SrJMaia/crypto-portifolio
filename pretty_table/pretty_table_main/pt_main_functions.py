@@ -7,7 +7,6 @@ def main_menu_body():
     pt_menu.title = "Menu"
     pt_menu.add_row(["Show All", mv.SHOW_ALL])
     pt_menu.add_row(["Wallet", mv.WALLET_OPTIONS])
-    # y.add_row(["Hobart", 1357])
     # y.add_row(["Sydney", 2058])
     # y.add_row(["Melbourne", 1566])
     # y.add_row(["Perth", 5386])

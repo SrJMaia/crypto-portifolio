@@ -10,18 +10,21 @@ Adicionar mudar valor atual
     criar docstring
     organizar em multiplas pastas?
 
-print wallet, sort pela alocação
+Mudar moeda e adicionar moeda
+
+print wallet, sort pela alocação -> Pretty table ja faz isso
 
 csv para despesas
 csv para reserva e casa/projetos?
 
 pedir password no inciio, se errada, não entrar?
 Adicionar moeda
-4 - adicionar aportes com impacto e distribuição do aporte
 5 - adicionar adição de transação
 5.1 - adicionar o dry-in e fix-income-in
 5.2 - em change DayOrMonth adicionar a mudança do ano
 6 - usar google trends para nalise
+? - adicionar uma opição de quantos em quanto tempo atualizar carteira?
+? - fazer tudo uma classe?
 https://lazarinastoy.com/the-ultimate-guide-to-pytrends-google-trends-api-with-python/
 https://alternative.me/crypto/trends/
             # https://www.youtube.com/watch?v=i1Wn3mWrLME

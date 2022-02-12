@@ -5,6 +5,7 @@ from menu.menu_wallet import wallet_menu
 import menu.menu_variables as mv
 from tqdm import tqdm
 import time
+import sys
 
 def menu():
 
@@ -21,8 +22,9 @@ def menu():
         for i in tqdm(range(100)):
             time.sleep(0.02)
         clear_prints()
-        return
+        sys.exit()
     elif action == mv.SHOW_ALL:
         pass
     elif action == mv.WALLET_OPTIONS:
-        wallet_menu()            
+        wallet_menu()    
+            
