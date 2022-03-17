@@ -7,9 +7,9 @@ default_allocation,0.0,,0.05,0.2
 next_deposit,0.0,,0.0,0.0
 previous_deposit,0.0,,0.0,0.0
 deposit_impact,0.0,,0.0,0.0
-today_investment,4915.6855929527,,,
-gain,-1259.9042927811279,,,
-growth,-0.2040135948294787,,,
+today_investment,4668.015613852801,,,
+gain,-1507.574271881027,,,
+growth,-0.24411826234829165,,,
 pairs_ammount,16.0,,,
 next_goal,5000.0,,,
 eur,,4500.0,,

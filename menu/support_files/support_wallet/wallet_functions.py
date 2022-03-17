@@ -1,12 +1,14 @@
-import wallet.files_manipulation.files_manipulation_function as fmf
-from miscellaneous_functions.prints_functions import clear_prints
+from menu.support_files.files_manipulation.files_manipulation_function import save_only_time_now_to_file, read_if_program_started, write_if_program_started
+from menu.support_files.files_manipulation.transactions import read_transactions
+import menu.support_files.files_manipulation.files_manipulation_function as fmf
+import menu.support_files.support_wallet.wallet_variables as wv
 from data_extraction.binance_api import binance_data as bnbdata
-from csv_files.functions.transactions import read_transactions
 from data_extraction.web_scrapping import cmc_data as cmc
-import wallet.wallet_variables as wv
+import menu.shared_files.shared_variables as mv
+from datetime import timedelta, datetime
 from tqdm import tqdm
 
-def get_wallets():
+def get_wallets(force_refresh=False):
     try:
         df = read_transactions()
     except:
@@ -19,13 +21,21 @@ def get_wallets():
 
     last_index = fmf.read_last_index_csv()
 
+    flag_refresh = check_if_refresh_wallet()
+
+    if force_refresh:
+        flag_refresh = True
+
     if last_index == df.index[-1]:
         wallet_information = read_wallet_information()
         wallet = fmf.read_wallet()
         wallet = convert_wallet_to_float(wallet)
-        wallet, wallet_information = update_wallets_data(wallet, wallet_information)
-        fmf.save_wallet_to_csv(wallet)
-        fmf.save_wallet_information_to_csv(wallet_information)
+
+        if flag_refresh:
+            wallet, wallet_information = update_wallets_data(wallet, wallet_information)
+            fmf.save_wallet_to_csv(wallet)
+            fmf.save_wallet_information_to_csv(wallet_information)
+            
         return wallet, wallet_information
 
     wallet, wallet_information = loop_in_transactions(df.iloc[last_index:,:], wallet, wallet_information)
@@ -42,6 +52,30 @@ def get_wallets():
     fmf.save_wallet_information_to_csv(wallet_information)
 
     return wallet, wallet_information
+
+
+def starting_first_time_wallet():
+
+    flag_start = read_if_program_started()
+
+    if flag_start:
+        return
+
+    write_if_program_started(mv.PROGRAM_ON)
+
+    _, _ = get_wallets(force_refresh=True)
+
+    save_only_time_now_to_file()
+
+
+
+def check_if_refresh_wallet():
+    read_time, read_wait_time = fmf.get_time_and_wait_time_from_file()
+    delta = timedelta(minutes=read_wait_time) + read_time
+    now = datetime.now()
+    if now > delta:
+        return True
+    return False
 
 
 def adjust_interest(wallet):

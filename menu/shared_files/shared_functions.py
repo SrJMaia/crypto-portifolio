@@ -1,4 +1,4 @@
-import menu.menu_variables as mv
+import menu.shared_files.shared_variables as mv
 
 def get_menu_action(mode):
     while True:
@@ -15,14 +15,17 @@ def get_menu_action(mode):
             return int(input_action)
 
         if mode == "main":
-            if input_action not in [mv.SHOW_ALL ,mv.WALLET_OPTIONS]:
+            if input_action not in mv.MAIN_ACTION_LIST:
                 print("\nInvalid option.")
                 continue
         elif mode == "wallet":
-            if input_action not in [mv.SHOW_WALLET, mv.CHANGE_ANY_AMMOUNT, mv.ADD_CRYPTO]:
+            if input_action not in mv.WALLET_ACTION_LIST:
+                print("\nInvalid option.")
+                continue
+        elif mode == "options":
+            if input_action not in mv.OPTIONS_ACTION_LIST:
                 print("\nInvalid option.")
                 continue
 
         return int(input_action)
-
 

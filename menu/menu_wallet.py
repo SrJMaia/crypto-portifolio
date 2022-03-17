@@ -1,15 +1,14 @@
-from wallet.files_manipulation.files_manipulation_function import save_wallet_to_csv
+from menu.support_files.files_manipulation.files_manipulation_function import save_wallet_to_csv
 from data_extraction.binance_api.binance_data import get_last_price_available
+from menu.support_files.support_wallet.wallet_functions import get_wallets
 import pretty_table.pretty_table_wallet.pt_wallet_functions as ptwf
 from miscellaneous_functions.prints_functions import clear_prints
-from wallet.wallet_functions import get_wallets
-from menu.shared_functions import get_menu_action
-import wallet.wallet_variables as wv
-import menu.menu_variables as mv
+import menu.support_files.support_wallet.wallet_variables as wv
+from menu.shared_files.shared_functions import get_menu_action
+import menu.shared_files.shared_variables as mv
 import menu.menu_main as mmf
 
 def wallet_menu():
-
 
     ptwf.wallet_menu_body()
 
@@ -31,13 +30,16 @@ def wallet_menu():
         change_any_ammount(wallet)    
     elif action == mv.ADD_CRYPTO:
         add_crypto(wallet)
+    elif action == mv.UPDATE_WALLET:
+        update_wallet()
     
     wallet_menu()
 
 
 """ GENERAL """
 
-def check_confirmation_input_y_n_wallet(input_answer, wallet):
+def check_confirmation_input_y_n_wallet(input_answer):
+
     if input_answer not in mv.CHECK_CONFIRMATION:
         print("\nIncorrect option.")
         return False
@@ -45,29 +47,51 @@ def check_confirmation_input_y_n_wallet(input_answer, wallet):
     clear_prints()
 
     if input_answer == mv.CHECK_YES:
-        return
+        return True
 
-    change_any_ammount(wallet)
+    wallet_menu()
+
+
+""" UPDATE WALLET """
+
+def update_wallet():
+    print("\nUpdating wallet...\n")
+    _, _ = get_wallets(force_refresh=True)
+    clear_prints()
 
 
 """ ADD CRYPTO """
 
 def add_crypto(wallet):
+
     while True:
         input_action = input("\nEnter the crypto ticker: ").upper().replace(" ","")
 
-        price = get_last_price_available(input_action)
+        price, symbol = get_last_price_available(input_action)
 
-        if price[0] == mv.INVALID_PRICE:
+        if price == mv.INVALID_PRICE:
             print(f"\nInvalid input. Ticker: {input_action} | Price: {price}. Enter a valid one")
             continue
         
-        message = f"\nWould you like to add Crypto: {input_action} | Ticker: {price[1]} | Last Price: ${price[0]}? y/n: "
+        message = f"\nWould you like to add Crypto: {input_action} | Ticker: {symbol} | Last Price: ${price}? y/n: "
 
         input_confirmation = input(message).lower().replace(" ","")
 
-        check_confirmation_input_y_n_wallet(input_confirmation, wallet)
+        flag_check_input = check_confirmation_input_y_n_wallet(input_confirmation)
 
+        if not flag_check_input:
+            continue
+
+        if input_action in wallet.keys():
+            input_confirmation = input("\nCrypto already exists in the wallet. Would you like to try again? y/n: ")
+
+            flag_check_input = check_confirmation_input_y_n_wallet(input_confirmation)
+
+            if not flag_check_input:
+                continue
+
+            continue
+            
         wallet[input_action] = wv.COIN.copy()
 
         save_wallet_to_csv(wallet)
@@ -103,7 +127,10 @@ def confirm_new_and_old_value(crypto, option, new_value, wallet):
     while True:
         input_action = input(f"\nWould you like to change from {old_value} to {new_value}? y/n: ").lower().replace(" ","")
         
-        check_confirmation_input_y_n_wallet(input_action, wallet)
+        flag_check_input = check_confirmation_input_y_n_wallet(input_action)
+
+        if not flag_check_input:
+            continue
 
         return
 
@@ -112,7 +139,10 @@ def confirm_crypto_and_option(crypto, option, wallet):
     while True:
         input_action = input(f"\nWould you like to update {crypto} - {option.replace('_', ' ').title()}? y/n: ").lower().replace(" ","")
         
-        check_confirmation_input_y_n_wallet(input_action, wallet)
+        flag_check_input = check_confirmation_input_y_n_wallet(input_action)
+
+        if not flag_check_input:
+            continue
 
         return
 
@@ -134,6 +164,7 @@ def get_value_key(wallet, crypto_name):
             continue
 
         clear_prints()
+        
         if input_action == mv.PREVIOUS_MENU:
             change_any_ammount(wallet)
 

@@ -1,6 +1,6 @@
 import pretty_table.pretty_table_wallet.pt_wallet_variables as ptv
+import menu.shared_files.shared_variables as mv
 from prettytable import PrettyTable
-import menu.menu_variables as mv
 from colorama import Fore
 import pandas as pd
 
@@ -13,7 +13,7 @@ def wallet_menu_body():
     pt_menu.add_row(["Show Wallet", mv.SHOW_WALLET])
     pt_menu.add_row(["Change Any Ammount", mv.CHANGE_ANY_AMMOUNT])
     pt_menu.add_row(["Add Crypto", mv.ADD_CRYPTO])
-    # y.add_row(["Hobart", 1357])
+    pt_menu.add_row(["Update Wallet", mv.UPDATE_WALLET])
     # y.add_row(["Sydney", 2058])
     # y.add_row(["Melbourne", 1566])
     pt_menu.add_row(["Previous Menu", mv.PREVIOUS_MENU])
@@ -27,13 +27,16 @@ def wallet_menu_body():
 
 def wallet_change_any_value_cryptos_body(wallet):
     pt = PrettyTable()
+    pt.title = "Change Any Value"
+
     cryptos_list = list(wallet.keys())
     cryptos_list.insert(len(cryptos_list),"Previous Menu")
     pt.add_column("Cryptos", cryptos_list)
-    pt.title = "Change Any Value"
+
     input_list = [i+1 for i, v in enumerate(list(wallet.keys()))]
     input_list.insert(len(input_list), mv.PREVIOUS_MENU)
     pt.add_column("Input", input_list)
+    
     pt.align = "l"
     pt.hrules = 1
     print(pt)
@@ -42,14 +45,18 @@ def wallet_change_any_value_cryptos_body(wallet):
 
 def wallet_change_any_value_values_body(wallet, crypto_name):
     pt = PrettyTable()
+    pt.title = "Change Any Value"
+
     cryptos_keys_list = list(wallet[crypto_name].keys())
     cryptos_keys_list.insert(len(cryptos_keys_list),"Previous Menu")
     print_cryptos_keys = [x.replace("_", " ").title() for x in cryptos_keys_list]
+
     pt.add_column(crypto_name, print_cryptos_keys)
-    pt.title = "Change Any Value"
+
     input_list = [i+1 for i, v in enumerate(list(wallet[crypto_name].keys()))]
     input_list.insert(len(input_list), mv.PREVIOUS_MENU)
     pt.add_column("Input", input_list)
+
     pt.align = "l"
     pt.hrules = 1
     print(pt)
