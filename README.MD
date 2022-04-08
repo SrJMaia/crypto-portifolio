@@ -1,4 +1,4 @@
-crypto-portifolio
+# crypto-portifolio
 Purpose: read data from csv, call api for prices, show gains and losses.
 
 Disclaimer  
